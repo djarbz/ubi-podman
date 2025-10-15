@@ -20,6 +20,9 @@ EORUN
 # warning: Using latest is prone to errors if the image will ever update. Pin the version explicitly to a release tag
 # hadolint ignore=DL3007
 FROM registry.access.redhat.com/ubi${DISTRO_VERSION}/ubi:latest
+LABEL org.opencontainers.image.source="https://github.com/djarbz/ubi-podman"
+LABEL org.opencontainers.image.description="A UBI image with Podman tooling for use in Github Workflows."
+LABEL org.opencontainers.image.licenses="MIT"
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Install container tools
