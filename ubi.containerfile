@@ -1,5 +1,7 @@
 ARG UBI_VERSION=9
 
+# warning: Using latest is prone to errors if the image will ever update. Pin the version explicitly to a release tag
+# hadolint ignore=DL3007
 FROM docker.io/alpine/git:latest AS downloader
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
@@ -21,6 +23,8 @@ FROM registry.access.redhat.com/ubi${UBI_VERSION}/ubi:latest
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Install container tools
+# warning: Specify version with `dnf install -y <package>-<version>`
+# hadolint ignore=DL3041
 RUN <<EORUN
 dnf -y install jq git podman buildah skopeo
 dnf clean all
