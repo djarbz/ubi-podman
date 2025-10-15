@@ -52,7 +52,7 @@ jobs:
           fetch-depth: 0
 
       - name: Get container tools in UBI builder
-        run: dnf -y install podman podman-docker buildah skopeo
+        run: dnf -y install jq podman podman-docker buildah skopeo
 
       - name: Log in to the GitHub Container registry
         uses: redhat-actions/podman-login@v1
