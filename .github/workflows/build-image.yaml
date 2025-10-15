@@ -81,8 +81,8 @@ jobs:
           # Tags: latest ${{ steps.image_labels.outputs.version }} ${{ steps.image_labels.outputs.release }} YYMMDD SHA
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=${{ steps.image_labels.outputs.version }},enable={{is_default_branch}}
-            type=raw,value=${{ steps.image_labels.outputs.release }},enable={{is_default_branch}}
+            type=raw,value=v${{ steps.image_labels.outputs.version }},enable={{is_default_branch}}
+            type=raw,value=r${{ steps.image_labels.outputs.release }},enable={{is_default_branch}}
             type=schedule,pattern={{date 'YYYYMMDD' tz='America/Chicago'}},enable={{is_default_branch}}
             type=sha
 
