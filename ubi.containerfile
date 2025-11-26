@@ -36,7 +36,7 @@ EORUN
 
 # warning: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>`
 # hadolint ignore=DL3013
-RUN pip install --no-cache-dir --root-user-action=ignore pykickstart
+RUN PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart
 
 
 COPY --from=downloader /usr/local/bin/hadolint /usr/local/bin/hadolint
