@@ -34,7 +34,9 @@ dnf clean all
 rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm
 EORUN
 
-RUN pip install --root-user-action=ignore pykickstart
+# warning: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>`
+# hadolint ignore=DL3013
+RUN pip install --no-cache-dir --root-user-action=ignore pykickstart
 
 
 COPY --from=downloader /usr/local/bin/hadolint /usr/local/bin/hadolint
