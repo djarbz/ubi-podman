@@ -29,7 +29,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # warning: Specify version with `dnf install -y <package>-<version>`
 # hadolint ignore=DL3041
 RUN <<EORUN
-dnf -y install podman buildah skopeo jq git gettext
+dnf -y install podman buildah skopeo jq git gettext python3-pip
 dnf clean all
 rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm
 EORUN
