@@ -23,12 +23,12 @@ jobs:
     #runs-on: [self-hosted, linux]
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: lint
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: ${{ env.CONTAINERFILE }}
 
@@ -47,21 +47,17 @@ jobs:
 
     steps:
       - name: Clone the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Get container tools in UBI builder
         run: dnf -y install jq podman podman-docker buildah skopeo
 
-      - name: Log in to the GitHub Container registry
-        uses: redhat-actions/podman-login@v1
-        with:
-          registry: ghcr.io/${{ github.repository }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          # https://github.com/redhat-actions/podman-login/issues/41
-          auth_file_path: "/run/containers/0/auth.json"
+      # Replacing redhat-actions/podman-login
+      - name: Log in to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Upstream UBI Image
         run: podman pull registry.access.redhat.com/ubi${{ env.DISTRO_VERSION}}/ubi:latest
@@ -86,18 +82,30 @@ jobs:
             type=schedule,pattern={{date 'YYYYMMDD' tz='America/Chicago'}},enable={{is_default_branch}}
             type=sha
 
-      - name: Use buildah build to create the image
+      # Replacing redhat-actions/buildah-build and use the `docker format` to support the SHELL instruction.
+      - name: Build Image with Buildah
         id: build-image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          build-args: |
-            DISTRO_VERSION=${{ env.DISTRO_VERSION }}
-          tags: ${{ steps.meta.outputs.tags }}
-          containerfiles: ${{ env.CONTAINERFILE }}
+        run: |
+          # 1. Extract the primary tag
+          PRIMARY_TAG=$(echo '${{ steps.meta.outputs.json }}' | jq -r '.tags[0]')
 
-      - name: Push to GitHub Container Repository
-        id: push-to-ghcr
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
+          # 2. Build the image with docker format
+          buildah bud \
+            --format docker \
+            --build-arg DISTRO_VERSION=${{ env.DISTRO_VERSION }} \
+            --file ${{ env.CONTAINERFILE }} \
+            --tag "$PRIMARY_TAG" .
+
+          # 3. Apply the remaining tags
+          for TAG in $(echo '${{ steps.meta.outputs.json }}' | jq -r '.tags[]'); do
+            buildah tag "$PRIMARY_TAG" "$TAG"
+          done
+
+      # Replacing redhat-actions/push-to-registry
+      - name: Push to GHCR
+        run: |
+          # Use the JSON output to iterate cleanly
+          for TAG in $(echo '${{ steps.meta.outputs.json }}' | jq -r '.tags[]'); do
+            echo "Pushing $TAG..."
+            buildah push "$TAG"
+          done
