@@ -12,7 +12,7 @@ on:
       - "ubi.containerfile"
 
 env:
-  DISTRO_VERSION: 9
+  DISTRO_VERSION: 10
   CONTAINERFILE: ubi.containerfile
 
 # Reference: https://github.com/nzwulfin/cicd-bootc/blob/main/.github/workflows/build_fedora_bootc.yml
