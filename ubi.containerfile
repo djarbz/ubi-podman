@@ -34,6 +34,13 @@ dnf clean all
 rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm
 EORUN
 
+# Install GitHub CLI (gh)
+# hadolint ignore=DL3041
+RUN curl -fsSL https://cli.github.com/packages/rpm/gh-cli.repo -o /etc/yum.repos.d/github-cli.repo \
+    && dnf -y install gh \
+    && dnf clean all \
+    && rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm
+
 # warning: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>`
 # hadolint ignore=DL3013
 RUN PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart
