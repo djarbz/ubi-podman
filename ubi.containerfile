@@ -39,11 +39,10 @@ EORUN
 RUN curl -fsSL https://cli.github.com/packages/rpm/gh-cli.repo -o /etc/yum.repos.d/github-cli.repo \
     && dnf -y install gh \
     && dnf clean all \
-    && rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm
-
+    && rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm \
+    && git config --system --add safe.directory '*'
 # Tell git to trust all directories, bypassing dubious ownership checks 
 # caused by Docker volume mounts in GitHub Actions
-RUN git config --system --add safe.directory '*'
 
 # warning: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>`
 # hadolint ignore=DL3013
