@@ -41,6 +41,10 @@ RUN curl -fsSL https://cli.github.com/packages/rpm/gh-cli.repo -o /etc/yum.repos
     && dnf clean all \
     && rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm
 
+# Tell git to trust all directories, bypassing dubious ownership checks 
+# caused by Docker volume mounts in GitHub Actions
+RUN git config --system --add safe.directory '*'
+
 # warning: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>`
 # hadolint ignore=DL3013
 RUN PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart
