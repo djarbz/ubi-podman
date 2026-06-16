@@ -22,6 +22,9 @@ COPY --from=docker.io/koalaman/shellcheck:stable /bin/shellcheck /usr/local/bin/
 # warning: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>`
 # hadolint ignore=DL3041,DL3013
 RUN <<EORUN
+# Exit immediately if a command exits with a non-zero status
+set -e
+
 # Add GitHub CLI repo
 curl -fsSL https://cli.github.com/packages/rpm/gh-cli.repo -o /etc/yum.repos.d/github-cli.repo
 
@@ -44,7 +47,7 @@ dnf clean all
 rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm
 
 # Tell git to trust all directories, bypassing dubious ownership checks caused by Docker volume mounts in GitHub Actions
-RUN git config --system --add safe.directory '*'
+git config --system --add safe.directory '*'
 
 # Install python packages
 PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart systemdlint
