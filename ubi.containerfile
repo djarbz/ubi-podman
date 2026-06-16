@@ -46,7 +46,7 @@ RUN curl -fsSL https://cli.github.com/packages/rpm/gh-cli.repo -o /etc/yum.repos
 
 # warning: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>`
 # hadolint ignore=DL3013
-RUN PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart
+RUN PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart systemdlint
 
 
 COPY --from=downloader /usr/local/bin/hadolint /usr/local/bin/hadolint
