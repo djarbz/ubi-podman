@@ -9,17 +9,18 @@ LABEL org.opencontainers.image.licenses="MIT"
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # ==========================================
-# 1. Install Standalone Binaries
+# Install Standalone Binaries
 # ==========================================
 COPY --from=ghcr.io/hadolint/hadolint:latest /bin/hadolint /usr/local/bin/hadolint
 COPY --from=docker.io/mvdan/shfmt:latest /bin/shfmt /usr/local/bin/shfmt
 COPY --from=docker.io/koalaman/shellcheck:stable /bin/shellcheck /usr/local/bin/shellcheck
 
 # ==========================================
-# 2. Install System Packages & GitHub CLI
+# Install System Packages & GitHub CLI
 # ==========================================
 # warning: Specify version with `dnf install -y <package>-<version>`
-# hadolint ignore=DL3041
+# warning: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>`
+# hadolint ignore=DL3041,DL3013
 RUN <<EORUN
 # Add GitHub CLI repo
 curl -fsSL https://cli.github.com/packages/rpm/gh-cli.repo -o /etc/yum.repos.d/github-cli.repo
@@ -41,15 +42,10 @@ dnf -y install \
 # Clean up DNF caches to drastically reduce image size
 dnf clean all
 rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm
-EORUN
 
-# ==========================================
-# 3. Configure Git & Python Tools
-# ==========================================
-# Tell git to trust all directories, bypassing dubious ownership checks 
-# caused by Docker volume mounts in GitHub Actions
+# Tell git to trust all directories, bypassing dubious ownership checks caused by Docker volume mounts in GitHub Actions
 RUN git config --system --add safe.directory '*'
 
-# warning: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>`
-# hadolint ignore=DL3013
-RUN PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart systemdlint
+# Install python packages
+PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart systemdlint
+EORUN
