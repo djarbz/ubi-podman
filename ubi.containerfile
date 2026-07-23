@@ -50,5 +50,5 @@ rm -rf /var/cache /var/log /var/lib/dnf /var/lib/rhsm
 git config --system --add safe.directory '*'
 
 # Install python packages
-PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart systemdlint
+PIP_ROOT_USER_ACTION=ignore pip install --no-cache-dir pykickstart systemdlint pyyaml
 EORUN
